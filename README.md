@@ -1,3 +1,11 @@
+> 前端配合 [RuoYi-Vue-Plus-ui-v3](https://github.com/eezd/RuoYi-Vue-Plus-ui-v3) 使用, 兼容原版(只需修改菜单表数据及代码生成模块), 菜单表主要是改下组件地址 
+> ```sql
+> UPDATE `ry-vue`.`sys_menu` SET `menu_name` = '修改生成配置', `parent_id` = 3, `order_num` = 2, `path` = 'gen-edit/index/:tableId', `component` = 'tool/gen-edit/index', `query_param` = '', `is_frame` = 1, `is_cache` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = 'tool:gen:edit', `icon` = '#', `create_dept` = 103, `create_by` = 1, `create_time` = '2026-02-11 14:21:16', `update_by` = NULL, `update_time` = NULL, `remark` = '/tool/gen' WHERE `menu_id` = 116;
+> UPDATE `ry-vue`.`sys_menu` SET `menu_name` = '租户套餐管理', `parent_id` = 6, `order_num` = 2, `path` = 'tenantPackage', `component` = 'system/tenant-package/index', `query_param` = '', `is_frame` = 1, `is_cache` = 0, `menu_type` = 'C', `visible` = '0', `status` = '0', `perms` = 'system:tenantPackage:list', `icon` = 'form', `create_dept` = 103, `create_by` = 1, `create_time` = '2026-02-11 14:21:16', `update_by` = NULL, `update_time` = NULL, `remark` = '租户套餐管理菜单' WHERE `menu_id` = 122;
+> UPDATE `ry-vue`.`sys_menu` SET `menu_name` = '分配用户', `parent_id` = 1, `order_num` = 2, `path` = 'role-auth/user/:roleId', `component` = 'system/role/auth-user/index', `query_param` = '', `is_frame` = 1, `is_cache` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = 'system:role:edit', `icon` = '#', `create_dept` = 103, `create_by` = 1, `create_time` = '2026-02-11 14:21:16', `update_by` = NULL, `update_time` = NULL, `remark` = '/system/role' WHERE `menu_id` = 130;
+> UPDATE `ry-vue`.`sys_menu` SET `menu_name` = '分配用户', `parent_id` = 1, `order_num` = 2, `path` = 'role-auth/user/:roleId', `component` = 'system/user/auth-role/index', `query_param` = '', `is_frame` = 1, `is_cache` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = 'system:role:edit', `icon` = '#', `create_dept` = 103, `create_by` = 1, `create_time` = '2026-02-11 14:21:16', `update_by` = NULL, `update_time` = NULL, `remark` = '/system/role' WHERE `menu_id` = 130;
+> ```
+
 <img src="https://foruda.gitee.com/images/1679673773341074847/178e8451_1766278.png" width="50%" height="50%">
 <div style="height: 10px; clear: both;"></div>
 
