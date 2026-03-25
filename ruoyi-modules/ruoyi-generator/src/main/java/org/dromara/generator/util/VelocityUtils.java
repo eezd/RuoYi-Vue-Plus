@@ -136,6 +136,8 @@ public class VelocityUtils {
         } else if (GenConstants.TPL_TREE.equals(tplCategory)) {
             templates.add("vm/vue/index-tree.vue.vm");
         }
+        templates.add("vm/vue/components/DataDialog.vue.vm");
+        templates.add("vm/vue/components/DataTable.vue.vm");
         return templates;
     }
 
@@ -180,13 +182,17 @@ public class VelocityUtils {
         } else if (template.contains("sql.vm")) {
             fileName = businessName + "Menu.sql";
         } else if (template.contains("api.ts.vm")) {
-            fileName = StringUtils.format("{}/api/{}/{}/index.ts", vuePath, moduleName, businessName);
+            fileName = StringUtils.format("{}/common/apis/{}/{}/index.ts", vuePath, moduleName, businessName);
         } else if (template.contains("types.ts.vm")) {
-            fileName = StringUtils.format("{}/api/{}/{}/types.ts", vuePath, moduleName, businessName);
+            fileName = StringUtils.format("{}/common/apis/{}/{}/types.ts", vuePath, moduleName, businessName);
         } else if (template.contains("index.vue.vm")) {
-            fileName = StringUtils.format("{}/views/{}/{}/index.vue", vuePath, moduleName, businessName);
+            fileName = StringUtils.format("{}/pages/{}/{}/index.vue", vuePath, moduleName, businessName);
         } else if (template.contains("index-tree.vue.vm")) {
-            fileName = StringUtils.format("{}/views/{}/{}/index.vue", vuePath, moduleName, businessName);
+            fileName = StringUtils.format("{}/pages/{}/{}/index.vue", vuePath, moduleName, businessName);
+        } else if (template.contains("DataDialog.vue.vm")) {
+            fileName = StringUtils.format("{}/pages/{}/{}/components/DataDialog.vue", vuePath, moduleName, businessName);
+        } else if (template.contains("DataTable.vue.vm")) {
+            fileName = StringUtils.format("{}/pages/{}/{}/components/DataTable.vue", vuePath, moduleName, businessName);
         }
         return fileName;
     }

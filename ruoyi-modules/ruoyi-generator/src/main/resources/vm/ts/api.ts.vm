@@ -1,6 +1,5 @@
-import request from '@/utils/request';
-import { AxiosPromise } from 'axios';
-import { ${BusinessName}VO, ${BusinessName}Form, ${BusinessName}Query } from '@/api/${moduleName}/${businessName}/types';
+import {${BusinessName}Form, ${BusinessName}Query, ${BusinessName}VO} from './types'
+import {request} from "@/http/axios"
 
 /**
  * 查询${functionName}列表
@@ -8,56 +7,56 @@ import { ${BusinessName}VO, ${BusinessName}Form, ${BusinessName}Query } from '@/
  * @returns {*}
  */
 
-export const list${BusinessName} = (query?: ${BusinessName}Query): AxiosPromise<${BusinessName}VO[]> => {
-  return request({
-    url: '/${moduleName}/${businessName}/list',
-    method: 'get',
-    params: query
-  });
+export function getSys${BusinessName}ListApi(query?: ${BusinessName}Query) {
+    return request<ApiResponsePageData<${BusinessName}VO[]>>({
+        url: '/${moduleName}/${businessName}/list',
+        method: 'get',
+        params: query
+    });
 };
 
 /**
  * 查询${functionName}详细
  * @param ${pkColumn.javaField}
  */
-export const get${BusinessName} = (${pkColumn.javaField}: string | number): AxiosPromise<${BusinessName}VO> => {
-  return request({
-    url: '/${moduleName}/${businessName}/' + ${pkColumn.javaField},
-    method: 'get'
-  });
-};
+export function getSys${BusinessName}Api(${pkColumn.javaField}: string | number) {
+    return request<ApiResponseData<${BusinessName}VO>>({
+        url: '/${moduleName}/${businessName}/' + ${pkColumn.javaField},
+        method: "get"
+    })
+}
 
 /**
  * 新增${functionName}
  * @param data
  */
-export const add${BusinessName} = (data: ${BusinessName}Form) => {
-  return request({
-    url: '/${moduleName}/${businessName}',
-    method: 'post',
-    data: data
-  });
-};
+export function addSys${BusinessName}Api(data: ${BusinessName}Form) {
+    return request<ApiResponseData<null>>({
+        url: '/${moduleName}/${businessName}',
+        method: "post",
+        data
+    })
+}
 
 /**
  * 修改${functionName}
  * @param data
  */
-export const update${BusinessName} = (data: ${BusinessName}Form) => {
-  return request({
-    url: '/${moduleName}/${businessName}',
-    method: 'put',
-    data: data
-  });
-};
+export function updateSys${BusinessName}Api(data: ${BusinessName}Form) {
+    return request<ApiResponseData<null>>({
+        url: '/${moduleName}/${businessName}',
+        method: "put",
+        data
+    })
+}
 
 /**
  * 删除${functionName}
  * @param ${pkColumn.javaField}
  */
-export const del${BusinessName} = (${pkColumn.javaField}: string | number | Array<string | number>) => {
-  return request({
-    url: '/${moduleName}/${businessName}/' + ${pkColumn.javaField},
-    method: 'delete'
-  });
-};
+export function delSys${BusinessName}Api(${pkColumn.javaField}: string | number | Array<string | number>) {
+    return request<ApiResponseData<null>>({
+        url: '/${moduleName}/${businessName}/' + ${pkColumn.javaField},
+        method: "delete"
+    })
+}
