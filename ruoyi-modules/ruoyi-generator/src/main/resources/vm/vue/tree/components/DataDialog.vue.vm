@@ -1,0 +1,249 @@
+<script lang="ts" setup>
+import type { FormInstance, FormRules } from "element-plus"
+import type { FormActionEmits } from "types/common"
+import type { TreeOptionsType } from "../index.vue"
+import type { ${BusinessName}Form } from "@/common/apis/${moduleName}/${businessName}/types.ts"
+import { addSys${BusinessName}Api, updateSys${BusinessName}Api } from "@/common/apis/${moduleName}/${businessName}"
+import Editor from "@@/components/Editor/index.vue"
+import FileUpload from "@@/components/FileUpload/index.vue"
+import ImageUpload from "@@/components/ImageUpload/index.vue"
+import { useDevice } from "@@/composables/useDevice.ts"
+#if(${dicts} != '')
+import { useDict } from "@@/composables/useDict.ts"
+#end
+import { ElMessage } from "element-plus"
+import { ref } from "vue"
+
+const emit = defineEmits<FormActionEmits>()
+
+/**
+ * defineModel
+ */
+// #region defineModel
+const dialog = defineModel<DialogOption>("dialog", { required: true })
+const formData = defineModel<Partial<${BusinessName}Form>>(
+  "formData",
+  {
+    required: true
+  }
+)
+const treeData = defineModel<TreeOptionsType[]>(
+  "treeData",
+  {
+    required: true
+  }
+)
+// #endregion
+
+const { isMobile } = useDevice()
+#if(${dicts} != '')
+#set($dictsNoSymbol=$dicts.replace("'", ""))
+const { ${dictsNoSymbol} } = toRefs<any>(useDict(${dicts}))
+#end
+
+const formRef = ref<FormInstance | null>(null)
+const formRules: FormRules<${BusinessName}Form> = {
+#foreach ($column in $columns)
+#if(($column.insert || $column.edit) && $column.required)
+#set($parentheseIndex=$column.columnComment.indexOf("（"))
+#if($parentheseIndex != -1)
+#set($comment=$column.columnComment.substring(0, $parentheseIndex))
+#else
+#set($comment=$column.columnComment)
+#end
+  $column.javaField: [
+    { required: true, message: "${comment}不能为空", trigger: #if($column.htmlType == "select" || $column.htmlType == "radio" || $column.htmlType == "checkbox")"change"#else"blur"#end }
+  ]#if($foreach.count != $columns.size()),#end
+#end
+#end
+}
+
+async function handleSubmit() {
+  if (!formRef.value) return
+  try {
+    await formRef.value.validate()
+#foreach ($column in $columns)
+#if($column.htmlType == "checkbox")
+    formData.value.$column.javaField = (formData.value.${column.javaField} as unknown as string[]).join(",")
+#end
+#end
+    dialog.value.loading = true
+    const isUpdate = !!formData.value.${pkColumn.javaField}
+    const reqData = formData.value as ${BusinessName}Form
+    const res = isUpdate
+      ? await updateSys${BusinessName}Api(reqData)
+      : await addSys${BusinessName}Api(reqData)
+    ElMessage.success(res.msg)
+    resetForm()
+    dialog.value.visible = false
+    emit("success")
+  } finally {
+    dialog.value.loading = false
+  }
+}
+
+function handleCancel() {
+  resetForm()
+  dialog.value.visible = false
+  emit("cancel")
+}
+
+function resetForm() {
+  formRef.value?.clearValidate()
+}
+</script>
+
+<template>
+  <el-drawer
+    v-model="dialog.visible"
+    :title="dialog.title"
+    direction="rtl"
+    :size="isMobile ? '90%' : '40%'"
+    @closed="handleCancel"
+    class="system-drawer"
+    modal-class="system-drawer-modal"
+    :lock-scroll="true"
+    destroy-on-close
+  >
+    <template #header="{ titleId, titleClass }">
+      <div :id="titleId" :class="titleClass" class="drawer-header">
+        <span>{{ dialog.title }}</span>
+      </div>
+    </template>
+    <div class="drawer-content">
+      <el-form ref="formRef" v-loading="dialog.loading" label-width="auto" :model="formData" :rules="formRules" label-position="left">
+#foreach($column in $columns)
+#set($field=$column.javaField)
+#if(($column.insert || $column.edit) && !$column.pk)
+#set($parentheseIndex=$column.columnComment.indexOf("（"))
+#if($parentheseIndex != -1)
+#set($comment=$column.columnComment.substring(0, $parentheseIndex))
+#else
+#set($comment=$column.columnComment)
+#end
+#set($dictType=$column.dictType)
+#if("" != $treeParentCode && $column.javaField == $treeParentCode)
+        <el-form-item prop="${treeParentCode}" label="${comment}">
+          <el-tree-select
+            v-model="formData.${treeParentCode}"
+            :data="treeData"
+            :props="{ value: '${treeCode}', label: '${treeName}', children: 'children' }"
+            value-key="${treeCode}"
+            placeholder="请选择${comment}"
+            check-strictly
+            :disabled="!dialog.isEditable"
+          />
+        </el-form-item>
+#elseif($column.htmlType == "input")
+        <el-form-item prop="${field}" label="${comment}">
+          <el-input v-model="formData.${field}" placeholder="请输入${comment}" :disabled="!dialog.isEditable" />
+        </el-form-item>
+#elseif($column.htmlType == "imageUpload")
+        <el-form-item prop="${field}" label="${comment}">
+          <ImageUpload v-model:file-ids="formData.${field}" />
+        </el-form-item>
+#elseif($column.htmlType == "fileUpload")
+        <el-form-item prop="${field}" label="${comment}">
+          <FileUpload v-model:file-ids="formData.${field}" />
+        </el-form-item>
+#elseif($column.htmlType == "editor")
+        <el-form-item label="${comment}">
+          <Editor v-model:content="formData.${field}" :min-height="192" />
+        </el-form-item>
+#elseif($column.htmlType == "select" && "" != $dictType)
+        <el-form-item prop="${field}" label="${comment}">
+          <el-select v-model="formData.${field}" placeholder="请选择${comment}" :disabled="!dialog.isEditable">
+            <el-option
+              v-for="dict in ${dictType}"
+              :key="dict.value"
+              :label="dict.label"
+#if($column.javaType == "Integer" || $column.javaType == "Long")
+              :value="parseInt(dict.value)"
+#else
+              :value="dict.value"
+#end
+            />
+          </el-select>
+        </el-form-item>
+#elseif($column.htmlType == "select" && $dictType)
+        <el-form-item prop="${field}" label="${comment}">
+          <el-select v-model="formData.${field}" placeholder="请选择${comment}" :disabled="!dialog.isEditable">
+            <el-option label="请选择字典生成" value="" />
+          </el-select>
+        </el-form-item>
+#elseif($column.htmlType == "checkbox" && "" != $dictType)
+        <el-form-item prop="${field}" label="${comment}">
+          <el-checkbox-group v-model="formData.${field}" :disabled="!dialog.isEditable">
+            <el-checkbox
+              v-for="dict in ${dictType}"
+              :key="dict.value"
+              :label="dict.value"
+            >
+              {{ dict.label }}
+            </el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+#elseif($column.htmlType == "checkbox" && $dictType)
+        <el-form-item prop="${field}" label="${comment}">
+          <el-checkbox-group v-model="formData.${field}" :disabled="!dialog.isEditable">
+            <el-checkbox>请选择字典生成</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+#elseif($column.htmlType == "radio" && "" != $dictType)
+        <el-form-item prop="${field}" label="${comment}">
+          <el-radio-group v-model="formData.${field}" :disabled="!dialog.isEditable">
+            <el-radio
+              v-for="dict in ${dictType}"
+              :key="dict.value"
+#if($column.javaType == "Integer" || $column.javaType == "Long")
+              :value="parseInt(dict.value)"
+#else
+              :value="dict.value"
+#end
+            >
+              {{ dict.label }}
+            </el-radio>
+          </el-radio-group>
+        </el-form-item>
+#elseif($column.htmlType == "radio" && $dictType)
+        <el-form-item prop="${field}" label="${comment}">
+          <el-radio-group v-model="formData.${field}" :disabled="!dialog.isEditable">
+            <el-radio value="1">请选择字典生成</el-radio>
+          </el-radio-group>
+        </el-form-item>
+#elseif($column.htmlType == "datetime")
+        <el-form-item prop="${field}" label="${comment}">
+          <el-date-picker
+            v-model="formData.${field}"
+            type="datetime"
+            value-format="YYYY-MM-DD HH:mm:ss"
+            placeholder="请选择${comment}"
+            clearable
+            :disabled="!dialog.isEditable"
+          />
+        </el-form-item>
+#elseif($column.htmlType == "textarea")
+        <el-form-item prop="${field}" label="${comment}">
+          <el-input v-model="formData.${field}" type="textarea" placeholder="请输入内容" :disabled="!dialog.isEditable" />
+        </el-form-item>
+#end
+#end
+#end
+      </el-form>
+    </div>
+    <template #footer>
+      <div class="drawer-footer">
+        <el-button class="btn-cancel" @click="handleCancel">
+          取消
+        </el-button>
+        <el-button class="btn-submit" type="primary" @click="handleSubmit" :loading="dialog.loading" :disabled="!dialog.isEditable">
+          确认
+        </el-button>
+      </div>
+    </template>
+  </el-drawer>
+</template>
+
+<style lang="scss" scoped>
+</style>
+

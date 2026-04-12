@@ -132,12 +132,14 @@ public class VelocityUtils {
         templates.add("vm/ts/api.ts.vm");
         templates.add("vm/ts/types.ts.vm");
         if (GenConstants.TPL_CRUD.equals(tplCategory)) {
-            templates.add("vm/vue/index.vue.vm");
+            templates.add("vm/vue/main/index.vue.vm");
+            templates.add("vm/vue/main/components/DataDialog.vue.vm");
+            templates.add("vm/vue/main/components/DataTable.vue.vm");
         } else if (GenConstants.TPL_TREE.equals(tplCategory)) {
-            templates.add("vm/vue/index-tree.vue.vm");
+            templates.add("vm/vue/tree/index.vue.vm");
+            templates.add("vm/vue/tree/components/DataDialog.vue.vm");
+            templates.add("vm/vue/tree/components/DataTable.vue.vm");
         }
-        templates.add("vm/vue/components/DataDialog.vue.vm");
-        templates.add("vm/vue/components/DataTable.vue.vm");
         return templates;
     }
 
@@ -187,7 +189,7 @@ public class VelocityUtils {
             fileName = StringUtils.format("{}/common/apis/{}/{}/types.ts", vuePath, moduleName, businessName);
         } else if (template.contains("index.vue.vm")) {
             fileName = StringUtils.format("{}/pages/{}/{}/index.vue", vuePath, moduleName, businessName);
-        } else if (template.contains("index-tree.vue.vm")) {
+        } else if (template.contains("index.vue.vm")) {
             fileName = StringUtils.format("{}/pages/{}/{}/index.vue", vuePath, moduleName, businessName);
         } else if (template.contains("DataDialog.vue.vm")) {
             fileName = StringUtils.format("{}/pages/{}/{}/components/DataDialog.vue", vuePath, moduleName, businessName);
